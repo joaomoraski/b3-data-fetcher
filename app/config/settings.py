@@ -9,8 +9,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = Field()
     POSTGRES_PASSWORD: str = Field()
     POSTGRES_DB: str = Field()
-    PGADMING_DEFAULT_EMAIL: str = Field()
-    PGADMIN_DEFAULT_PASSWORD: str = Field()
+    APP_POSTGRESQL_URI: str = Field()
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
