@@ -1,8 +1,8 @@
-"""create fii tables
+"""creating-fii-history
 
-Revision ID: 459aa63a22d1
+Revision ID: f4d30db06c30
 Revises:
-Create Date: 2025-10-26 16:32:40.633635
+Create Date: 2025-10-31 19:56:07.521966
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "459aa63a22d1"
+revision: str = "f4d30db06c30"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -54,7 +54,7 @@ def upgrade() -> None:
         sa.Column("monthly_effective_return", sa.Float(), nullable=True),
         sa.Column("amortization_per_share", sa.Float(), nullable=True),
         sa.Column("total_investors", sa.Integer(), nullable=True),
-        sa.Column("total_liabilities", sa.Integer(), nullable=True),
+        sa.Column("total_liabilities", sa.Float(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(["fii_id"], ["fiis.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),

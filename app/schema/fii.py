@@ -1,29 +1,22 @@
+from datetime import date, datetime
 from decimal import ROUND_CEILING, Decimal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 
-class AtivoSchema(BaseModel):
+class FiiSchema(BaseModel):
     ticker: str = Field(...)
     valor_patrimonial_cota: float = Field(...)
+    data_referencia: date = Field(...)
     dy_mes: float = Field(...)
     dividendo_reais: float = Field(...)
     pvp: float = Field(...)
     preco: float = Field(...)
 
-    @field_validator(
-        "valor_patrimonial_cota",
-        "dy_mes",
-        "dividendo_reais",
-        "pvp",
-        "preco",
-        mode="before",
+    @field_serializer(
+        "valor_patrimonial_cota", "dy_mes", "dividendo_reais", "pvp", "preco"
     )
-    def round_two(cls, v):
-        if v is None:
-            return v
-        try:
-            valor = Decimal(str(v)).quantize(Decimal("0.01"), rounding=ROUND_CEILING)
-            return float(valor)
-        except Exception:
-            return v
+    def format_floats(value, info):
+        if value is None:
+            return None
+        return float(f"{value:.2f}")

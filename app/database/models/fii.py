@@ -50,8 +50,8 @@ class FiiFinancialHistory(BaseModel):
     monthly_equity_return = Column(Float)
     monthly_effective_return = Column(Float)
     amortization_per_share = Column(Float)
-    total_investors = Column(Integer)
-    total_liabilities = Column(Integer)
+    total_investors = Column(Float)
+    total_liabilities = Column(Float)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     fii = relationship("Fii", back_populates="financial_history")
