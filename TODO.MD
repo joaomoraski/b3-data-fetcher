@@ -1,8 +1,11 @@
 - [X] Criar estrutura Inicial api
 - [X] Fazer o retorno atual sair pela API também
-- [ ] Implementar Models e schemas
+- [X] Implementar Models e schemas
   - [X] Schema
-  - [ ] Model para banco
-- [ ] Docker compose do banco futuro
+  - [X] Model para banco
+- [X] Docker compose do banco futuro
 - [ ] Estudar GraphQL
+- [ ] Arrumar os fundos que estao inconsistentes no banco
+- [ ] implementar o resto das rotas
+- [ ] sei la
 - [X] pre-commit e etc(linter)

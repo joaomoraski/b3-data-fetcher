@@ -26,6 +26,8 @@ alembic = "^1.17.0"
 tqdm = "^4.67.1"
 asyncpg = "^0.30.0"
 asyncio = "^4.0.0"
+greenlet = "^3.2.4"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.44"}
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
