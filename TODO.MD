@@ -7,5 +7,11 @@
 - [ ] Estudar GraphQL
 - [ ] Arrumar os fundos que estao inconsistentes no banco
 - [ ] implementar o resto das rotas
-- [ ] sei la
+  - [X] Ticker history
+    - [X] Ticker history latest
+  - [X] Ticker Summary
+  - [X] Ranking DY
+  - [ ] Fiis filter
+  - [ ] Rotas para graficos
+- [ ] sei la (front)
 - [X] pre-commit e etc(linter)

@@ -30,6 +30,41 @@ class FiiGeneralPrice(FiiGeneral):
     price: float = Field(...)
 
 
+class FiiGeneralHistory(FiiGeneralPrice):
+    history: list["FiiFinancialHistory"] = Field(...)
+
+
+class FiiSummary(BaseModel):
+    pvp: float = Field(...)
+    monthly_dividend_yield: float = Field(...)
+    volatility: dict[str, float] = Field(...)
+    number_of_shareholders: float = Field(...)
+    net_worth: float = Field(...)
+    last_month_return: float = Field(...)
+    last_year_return: float = Field(...)
+    price: float = Field(...)
+
+
+class FiiFinancialHistory(BaseModel):
+    reference_date: date = Field(...)
+    book_value_per_share: float = Field(...)
+    net_worth: float = Field(...)
+    monthly_dy: float = Field(...)
+    real_monthly_dy: float = Field(...)
+    effective_return: float = Field(...)
+    number_of_shareholders: float = Field(...)
+    liabilities: float = Field(...)
+
+
+class RankingDy(BaseModel):
+    name: str = Field(...)
+    ticker: str = Field(...)
+    book_value_per_share: float = Field(...)
+    dividend_yield: float = Field(...)
+    real_dividend_yield: float = Field(...)
+    reference_date: date = Field(...)
+
+
 class FiiDyPvpVol(BaseModel):
     ticker: str = Field(...)
     valor_patrimonial_cota: float = Field(...)

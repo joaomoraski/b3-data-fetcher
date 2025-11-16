@@ -149,6 +149,12 @@ class BaseRepository:
     async def get(self, id: UUID | str) -> DeclarativeBase:
         return await self._session.get(self.model, id)
 
+    async def get_by_field(self, filter: str) -> DeclarativeBase:
+        column_name, value = filter.split(":", 1)
+        column = getattr(self.model, column_name)
+        statement = select(self.model).where(column == value)
+        return await self._session.scalar(statement)
+
     async def create(self, entity: DeclarativeBase) -> DeclarativeBase:
         self._session.add(entity)
         await self._session.commit()

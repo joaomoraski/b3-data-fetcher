@@ -11,10 +11,12 @@ from sqlalchemy import (
     Integer,
     String,
     UniqueConstraint,
+    desc,
 )
 from sqlalchemy.orm import relationship
 
 from app.database.base import BaseModel
+from app.schema.fii import FiiFinancialHistory
 
 
 class Fii(BaseModel):
@@ -34,7 +36,12 @@ class Fii(BaseModel):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
-    financial_history = relationship("FiiFinancialHistory", back_populates="fii")
+    financial_history = relationship(
+        "FiiFinancialHistory",
+        back_populates="fii",
+        lazy="selectin",
+        order_by=desc("reference_date"),
+    )
 
 
 class FiiFinancialHistory(BaseModel):

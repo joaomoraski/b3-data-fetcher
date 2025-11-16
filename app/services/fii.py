@@ -5,13 +5,26 @@ import pandas as pd
 import yfinance as yf
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import DeclarativeBase
 from yfinance import Ticker, Tickers
 
-from app.adapter.fii import fii_in_to_out_general, fii_in_to_out_general_price
+from app.adapter.fii import (
+    fii_in_to_out_financial_history,
+    fii_in_to_out_general,
+    fii_in_to_out_general_history,
+    fii_in_to_out_general_price,
+    fii_ranking_to_out,
+)
 from app.config.utils import verify_load_cache
 from app.database.models.fii import Fii, FiiFinancialHistory
 from app.database.repositories.repositories import FiiRepository
-from app.schema.fii import FiiDyPvpVol, FiiGeneral, FiiGeneralPrice
+from app.schema.fii import (
+    FiiDyPvpVol,
+    FiiGeneral,
+    FiiGeneralHistory,
+    FiiGeneralPrice,
+    FiiSummary,
+)
 
 general_file = "fii_geral.csv"
 active_passive_file = "fii_ativo_passivo.csv"
@@ -77,11 +90,98 @@ class FiiService:
         return [fii_in_to_out_general(fii) for fii in fiis]
 
     async def get_one(self, ticker: str) -> FiiGeneralPrice:
-        fiis = await self.repo.get_list(
-            params={"ticker_not_null": True, "ticker": ticker, "limit": 1}
-        )
-        fii: Fii = fiis[0]
+        fii: Fii = await self.repo.get_by_field(f"ticker:{ticker}")
 
         ticker = yf.Ticker(f"{ticker}.SA")
 
         return fii_in_to_out_general_price(fii, ticker.info.get("currentPrice"))
+
+    async def ticker_history(self, ticker: str) -> FiiGeneralHistory:
+        fii: Fii = await self.repo.get_by_field(f"ticker:{ticker}")
+
+        ticker = yf.Ticker(f"{ticker}.SA")
+
+        price = ticker.info.get("currentPrice")
+
+        fii_history = [
+            fii_in_to_out_financial_history(history, price)
+            for history in fii.financial_history
+        ]
+
+        return fii_in_to_out_general_history(fii, fii_history, price)
+
+    async def ticker_history_latest(self, ticker: str) -> FiiGeneralHistory:
+        fii: Fii = await self.repo.get_by_field(f"ticker:{ticker}")
+
+        ticker = yf.Ticker(f"{ticker}.SA")
+
+        price = ticker.info.get("currentPrice")
+
+        fii_history = [fii_in_to_out_financial_history(fii.financial_history[0], price)]
+
+        return fii_in_to_out_general_history(fii, fii_history, price)
+
+    async def ticker_summary(self, ticker_name: str) -> FiiSummary:
+        fii: Fii = await self.repo.get_by_field(f"ticker:{ticker_name}")
+        ticker = yf.Ticker(f"{ticker_name}.SA")
+        price = ticker.info.get("currentPrice")
+
+        latest_financial_history: FiiFinancialHistory = fii.financial_history[0]
+
+        pvp = price / latest_financial_history.book_value_per_share
+        monthly_dividend_yield = latest_financial_history.monthly_dividend_yield
+        real_monthly_dy = (
+            latest_financial_history.monthly_dividend_yield
+            * latest_financial_history.book_value_per_share
+        )
+        df = yf.download(
+            f"{ticker_name}.SA", period="1y", interval="1d", auto_adjust=True
+        )
+        # Usa o preço de fechamento ajustado
+        closing = df["Close"]
+        # Calcula retornos diários (percentuais)
+        returns = closing.pct_change().dropna()
+        # Calcula volatilidade mensal, trimestral, anual
+        vol_dict = {
+            "month_vol": np.std(returns, axis=0) * np.sqrt(23),
+            "quarter_vol": np.std(returns, axis=0) * np.sqrt(65),
+            "annual_vol": np.std(returns, axis=0) * np.sqrt(252),
+        }
+
+        number_of_shareholders = latest_financial_history.total_investors
+        net_worth = latest_financial_history.net_worth
+        last_month_return = latest_financial_history.monthly_effective_return
+
+        # get last year returns
+        last_12 = [h.monthly_effective_return for h in fii.financial_history[:12]]
+        # fix None occurrences
+        last_12 = [x for x in last_12 if x is not None]
+        annual_return = float(
+            np.prod([1 + x for x in last_12]) - 1 if last_12 else None
+        )
+
+        return FiiSummary(
+            pvp=pvp,
+            monthly_dividend_yield=monthly_dividend_yield,
+            volatility=vol_dict,
+            number_of_shareholders=number_of_shareholders,
+            net_worth=net_worth,
+            last_month_return=last_month_return,
+            last_year_return=annual_return,
+            price=price,
+        )
+
+    async def ranking_dy(self, limit: int, offset: int):
+        fii = await self.repo.ranking_dy(limit, offset)
+
+        return [
+            fii_ranking_to_out(
+                fii.name,
+                fii.ticker,
+                fii.book_value_per_share,
+                fii.monthly_dividend_yield,
+                fii.monthly_dividend_yield * fii.book_value_per_share,
+                fii.reference_date,
+            )
+            for fii in fii
+        ]
