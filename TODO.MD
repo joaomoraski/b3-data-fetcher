@@ -1,0 +1,17 @@
+- [X] Criar estrutura Inicial api
+- [X] Fazer o retorno atual sair pela API também
+- [X] Implementar Models e schemas
+  - [X] Schema
+  - [X] Model para banco
+- [X] Docker compose do banco futuro
+- [ ] Estudar GraphQL
+- [ ] Arrumar os fundos que estao inconsistentes no banco
+- [ ] implementar o resto das rotas
+  - [X] Ticker history
+    - [X] Ticker history latest
+  - [X] Ticker Summary
+  - [X] Ranking DY
+  - [ ] Fiis filter
+  - [ ] Rotas para graficos
+- [ ] sei la (front)
+- [X] pre-commit e etc(linter)
