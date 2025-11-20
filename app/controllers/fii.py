@@ -9,6 +9,7 @@ from app.schema.fii import (
     FiiGeneralPrice,
     FiiSummary,
     RankingDy,
+    TccPreliminarResults,
 )
 from app.schema.Paginator import (
     ListPaginatorResponse,
@@ -21,12 +22,40 @@ router = APIRouter(prefix="/fii", tags=["fii"])
 
 
 # http://127.0.0.1:8080/api/v1/fii/tcc?ticker=mxrf11
-@router.get("/tcc", include_in_schema=False)
+@router.get("/tcc/", include_in_schema=False)
 async def tcc(
     ticker: str, session: AsyncSession = Depends(get_db_session)
 ) -> FiiDyPvpVol:
     fii_service = FiiService(session)
     return await fii_service.tcc(ticker.upper())
+
+
+# http://127.0.0.1:8080/api/v1/fii/tcc/preliminar_results?alpha=0.5&beta=0.3&gamma=0.2&B=400&K=2&lambda_slot=0.1
+@router.get("/tcc/preliminar_results")
+async def get_tcc_preliminar_results(
+    alpha: float = Query(default=0.5, description="Peso de DY"),
+    beta: float = Query(default=0.3, description="Peso de PVP"),
+    gamma: float = Query(default=0.2, description="Peso de volatilidade"),
+    B: float = Query(default=400.0, description="Orçamento total"),
+    K: int = Query(default=2, description="Número de ativos a selecionar"),
+    lambda_slot: float = Query(default=0.1, description="Fator de penalidade por slot"),
+    tickers: list[str] | None = Query(
+        default=None, description="Lista de tickers para filtrar (opcional)"
+    ),
+    session: AsyncSession = Depends(get_db_session),
+) -> TccPreliminarResults:
+    fii_service = FiiService(session)
+    # Normalize tickers to uppercase if provided
+    normalized_tickers = [t.upper() for t in tickers] if tickers else None
+    return await fii_service.tcc_preliminar_results(
+        alpha=alpha,
+        beta=beta,
+        gamma=gamma,
+        B=B,
+        K=K,
+        lambda_slot=lambda_slot,
+        tickers=normalized_tickers,
+    )
 
 
 @router.get("/")
@@ -35,7 +64,7 @@ async def get_fiis(
     session: AsyncSession = Depends(get_db_session),
 ) -> ListPaginatorResponse[FiiGeneral]:
     fii_service = FiiService(session)
-    fii_list = await fii_service.list(
+    fii_list = await fii_service.list_fiis(
         limit=paginator_qs.limit, offset=paginator_qs.offset
     )
     count = await fii_service.count()

@@ -87,3 +87,35 @@ class FiiDyPvpVol(BaseModel):
         if value is None:
             return None
         return float(f"{value:.2f}")
+
+
+class FiiTccScoreResult(BaseModel):
+    ticker: str = Field(..., description="FII ticker")
+    dy_normalizado: float = Field(..., description="DY (normalizado)")
+    pvp_normalizado: float = Field(..., description="P/VP (normalizado)")
+    volatilidade_normalizado: float = Field(
+        ..., description="Volatilidade (normalizado)"
+    )
+    preco: float = Field(..., description="Preço (R$)")
+    penalidade_slot: float = Field(..., description="Penalidade Slot")
+    score: float = Field(..., description="Score final")
+
+
+class TccPreliminarSummary(BaseModel):
+    total_preco: float = Field(..., description="Preço total dos selecionados")
+    orcamento: float = Field(..., description="Orçamento total")
+    limite_por_ativo: float = Field(..., description="Limite por ativo (slot)")
+    status: str = Field(..., description="Status do orçamento")
+    top_k_tickers: list[str] = Field(
+        ..., description="Lista dos top K tickers selecionados"
+    )
+
+
+class TccPreliminarResults(BaseModel):
+    all_results: list[FiiTccScoreResult] = Field(
+        ..., description="Todos os resultados ordenados por score"
+    )
+    top_k_results: list[FiiTccScoreResult] = Field(
+        ..., description="Top K ativos selecionados"
+    )
+    summary: TccPreliminarSummary = Field(..., description="Resumo da seleção")

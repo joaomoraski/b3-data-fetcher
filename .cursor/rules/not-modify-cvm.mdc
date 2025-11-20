@@ -1,0 +1,5 @@
+---
+description: Do not change the logic inside CVM parser modules unless I explicitly ask for updates or fixes.
+globs: */consumers/data/**
+alwaysApply: false
+---

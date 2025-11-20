@@ -1,0 +1,10 @@
+---
+description: Consistent coding style and architecture patterns for the project
+alwaysApply: true
+---
+
+- Always use Python type hints
+- Follow Pydantic best practices
+- Keep functions under 50 lines
+- When improving code, propose tests when logic is changed
+- Follow the Repository -> Service -> Controller -> Adapter -> Pydantic schema architecture

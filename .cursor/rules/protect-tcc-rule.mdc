@@ -1,0 +1,4 @@
+---
+description: Never modify, refactor, rename, or delete the `/tcc/` route, controller, or service method. Only change these routes if I explicitly ask or if a breaking change in another module requires it. Note: `/tcc/preliminar_results` is a separate route and can be modified.
+alwaysApply: false
+---
