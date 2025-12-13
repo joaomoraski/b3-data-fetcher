@@ -22,7 +22,7 @@ router = APIRouter(prefix="/fii", tags=["fii"])
 
 
 # http://127.0.0.1:8080/api/v1/fii/tcc?ticker=mxrf11
-@router.get("/tcc/", include_in_schema=False)
+@router.get("/tcc/", include_in_schema=True)
 async def tcc(
     ticker: str, session: AsyncSession = Depends(get_db_session)
 ) -> FiiDyPvpVol:

@@ -86,7 +86,7 @@ class FiiDyPvpVol(BaseModel):
     def format_floats(value, info):
         if value is None:
             return None
-        return float(f"{value:.2f}")
+        return float(f"{value:.4f}")
 
 
 class FiiTccScoreResult(BaseModel):
