@@ -1,0 +1,8 @@
+---
+alwaysApply: false
+---
+When working with financial heuristics (such as the TCC preliminary results calculation):
+- Preserve all mathematical formulas and logic unless explicitly asked to change them
+- Explain every modification before applying it
+- Maintain all comments from the original code
+- Keep the same calculation order and normalization logic
